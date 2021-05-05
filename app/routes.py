@@ -12,12 +12,15 @@ def handle_planet(planet_id):
     # Try to find the planet with the given id
     planet = Planet.query.get(planet_id)
 
+    if planet is None:
+        return jsonify("Not Found", 404), 404
+
     if request.method == "GET":
         return {
             "id": planet.id,
             "title": planet.title,
             "description": planet.description
-        }, 200
+        }
 
     elif request.method == "PUT":
         form_data = request.get_json()
@@ -26,18 +29,15 @@ def handle_planet(planet_id):
         planet.description = form_data["description"]
 
         db.session.commit()
-        return jsonify(f"Planet #{planet.id} successfully updated"), 200
+        return jsonify(f"Planet #{planet.id} successfully updated")
 
     elif request.method == "DELETE":
         db.session.delete(planet)
         db.session.commit()
-        return jsonify(f"Planet #{planet.id} successfully deleted"), 200
+        return jsonify(f"Planet #{planet.id} successfully deleted")
 
 
-    return {
-        "message": f"Planet with id {planet_id} was not found",
-        "success": False,
-    }, 404
+    
 
 
 @planets_bp.route("", methods=["POST", "GET"], strict_slashes=False)
